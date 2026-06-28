@@ -1,0 +1,791 @@
+/* CSS Design System for AuraClinic Management System */
+
+:root {
+  /* Fonts */
+  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Color Palette - Premium Teal & Indigo Theme (Light Mode Default) */
+  --bg-app: #f4f6fa;
+  --bg-sidebar: #0f172a;
+  --bg-surface: rgba(255, 255, 255, 0.85);
+  --bg-surface-solid: #ffffff;
+  --bg-input: #f8fafc;
+  
+  --border-color: rgba(148, 163, 184, 0.15);
+  --border-focus: #0ea5e9;
+
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --text-on-primary: #ffffff;
+
+  --primary: #0ea5e9;
+  --primary-hover: #0284c7;
+  --primary-light: rgba(14, 165, 233, 0.1);
+  
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --accent-light: rgba(16, 185, 129, 0.1);
+
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --danger-light: rgba(239, 68, 68, 0.1);
+
+  /* Shadows & Glassmorphism */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 20px -2px rgba(148, 163, 184, 0.12), 0 2px 8px -1px rgba(148, 163, 184, 0.08);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --glass-blur: blur(12px);
+  --border-radius: 14px;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout sizing */
+  --sidebar-width: 260px;
+  --header-height: 70px;
+}
+
+/* Dark Mode Variables Override */
+[data-theme="dark"] {
+  --bg-app: #090d16;
+  --bg-sidebar: #05080f;
+  --bg-surface: rgba(15, 23, 42, 0.7);
+  --bg-surface-solid: #0f172a;
+  --bg-input: #1e293b;
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-focus: #38bdf8;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --primary: #38bdf8;
+  --primary-hover: #0ea5e9;
+  --primary-light: rgba(56, 189, 248, 0.15);
+  
+  --accent: #34d399;
+  --accent-hover: #10b981;
+  --accent-light: rgba(52, 211, 153, 0.15);
+
+  --shadow-md: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.6);
+}
+
+/* Reset & Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* App Containers - Fluid Touch Scroll & Responsive Layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+  min-width: 0;
+  padding: 2rem;
+  transition: padding var(--transition-normal);
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    padding: 1rem;
+    padding-top: calc(var(--header-height) + 1rem); /* Space for mobile nav toggle */
+    height: auto;
+    min-height: calc(100vh - var(--header-height));
+  }
+}
+
+/* Sidebar Styling - Fully Foldable and Responsive */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex-shrink: 0;
+  z-index: 100;
+  transition: transform var(--transition-normal), width var(--transition-normal);
+  color: #94a3b8;
+  border-right: 1px solid var(--border-color);
+}
+
+.sidebar-brand {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.25rem;
+  background: linear-gradient(135deg, #38bdf8, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.925rem;
+  transition: all var(--transition-fast);
+  color: #94a3b8;
+}
+
+.sidebar-item:hover, .sidebar-item.active {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+.sidebar-item.active {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+.sidebar-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Glassmorphism Cards */
+.glass-card {
+  background: var(--bg-surface);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  padding: 1.5rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-normal);
+  overflow: visible;
+  position: relative;
+  min-width: 0;
+}
+
+.glass-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Responsive Grid and Flex layouts */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.dashboard-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.flex-wrap-safe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Table Scroll Container Safety */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface-solid);
+  margin: 1rem 0;
+  box-shadow: var(--shadow-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.925rem;
+  min-width: 600px; /* Forces scrolling on small screens instead of crushing content */
+}
+
+th {
+  background-color: var(--bg-input);
+  padding: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background-color: rgba(14, 165, 233, 0.02);
+}
+
+/* Standard Buttons & Touch targets */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  min-height: 44px; /* iOS/Android touch accessibility minimum */
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: var(--text-on-primary);
+}
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.btn-success {
+  background-color: var(--accent);
+  color: var(--text-on-primary);
+}
+.btn-success:hover {
+  background-color: var(--accent-hover);
+}
+
+.btn-secondary {
+  background-color: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+.btn-secondary:hover {
+  background-color: var(--border-color);
+}
+
+.btn-danger {
+  background-color: var(--danger);
+  color: #fff;
+}
+.btn-danger:hover {
+  background-color: #dc2626;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Form Controls */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  min-height: 44px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+/* Badge tags for queues & status */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-pending { background-color: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.badge-active { background-color: var(--primary-light); color: var(--primary); }
+.badge-success { background-color: var(--accent-light); color: var(--accent); }
+.badge-danger { background-color: var(--danger-light); color: var(--danger); }
+
+/* Dialog Modal Overlay - Fixed responsive alignment */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.modal-content {
+  background-color: var(--bg-surface-solid);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 650px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+/* Mobile Toggle Navigation */
+.mobile-nav-toggle {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--bg-sidebar);
+  z-index: 99;
+  align-items: center;
+  padding: 0 1rem;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Split Grids */
+.responsive-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.responsive-split-grid-50 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Mobile Scroll Tabs Container */
+.mobile-scroll-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.25rem;
+  scrollbar-width: none;
+}
+.mobile-scroll-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Top Control Bar for Clinic Scale and Duty Doctor */
+.top-control-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.control-item span {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .top-control-bar {
+    justify-content: flex-start !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.85rem !important;
+  }
+  .control-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0.35rem !important;
+    width: 100% !important;
+  }
+  .control-item select {
+    width: 100% !important;
+  }
+}
+
+.responsive-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.full-width-card {
+  grid-column: span 2;
+}
+
+.catalog-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+/* Responsive Breakpoints & Mobile Adaptation */
+@media (max-width: 992px) {
+  .responsive-split-grid,
+  .responsive-split-grid-50,
+  .responsive-card-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .full-width-card {
+    grid-column: span 1 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .catalog-form {
+    flex-direction: column !important;
+  }
+  .catalog-form input,
+  .catalog-form select,
+  .catalog-form button {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 992px), (max-height: 600px) and (orientation: landscape) {
+  .mobile-nav-toggle {
+    display: flex !important;
+  }
+
+  .sidebar {
+    position: fixed !important;
+    left: 0 !important;
+    top: var(--header-height) !important;
+    height: calc(100vh - var(--header-height)) !important;
+    transform: translateX(-100%) !important;
+    width: var(--sidebar-width) !important;
+    z-index: 1000 !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  .main-content {
+    padding: 1rem !important;
+    padding-top: calc(var(--header-height) + 1rem) !important;
+  }
+
+  .glass-card {
+    padding: 1rem !important;
+  }
+
+  .modal-overlay {
+    padding: 0.5rem !important;
+  }
+
+  .modal-content {
+    max-height: 94vh !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 12px !important;
+  }
+
+  .modal-header, .modal-body, .modal-footer {
+    padding: 1rem !important;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+}
+
+/* Print utility helpers - Hidden on screen by default */
+.only-print {
+  display: none !important;
+}
+
+@media print {
+  /* Override theme variables for high-contrast black & white printing */
+  :root, [data-theme="dark"] {
+    --text-primary: #000000 !important;
+    --text-secondary: #222222 !important;
+    --text-muted: #555555 !important;
+    --bg-app: #ffffff !important;
+    --bg-surface-solid: #ffffff !important;
+    --bg-surface: #ffffff !important;
+    --border-color: #333333 !important;
+  }
+
+  /* Force print area text contrast and prevent background leaks */
+  .print-area, .print-area * {
+    color: #000000 !important;
+    background-color: transparent !important;
+    border-color: #333333 !important;
+  }
+
+  /* Hide every single element on the page */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Make ONLY elements inside the .print-area visible */
+  .print-area, .print-area * {
+    visibility: visible !important;
+  }
+
+  /* Force the print area container to position at 0,0 and take full page width */
+  .print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .only-print {
+    display: block !important;
+  }
+
+  body {
+    background-color: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  /* Thermal print container (POS Receipts / Prescription snippets) */
+  .thermal-receipt {
+    width: 80mm;
+    max-width: 80mm;
+    margin: 0 auto;
+    font-family: monospace;
+    font-size: 9pt;
+    line-height: 1.3;
+    padding: 2mm !important;
+    box-sizing: border-box;
+  }
+
+  .thermal-receipt td, .thermal-receipt th {
+    padding: 2px !important;
+  }
+
+  /* A4 Prescription Sheet */
+  .prescription-print-page {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 20mm;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+
+  /* ID Card Printer */
+  .id-card-print {
+    width: 85.6mm;
+    height: 53.98mm;
+    border: 1px solid #000 !important;
+    border-radius: 6px !important;
+    padding: 10px !important;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* A4 Invoice print styling */
+  .a4-invoice {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 15mm;
+    background: #fff !important;
+    color: #000 !important;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* A4 Barcode Grid Sheet */
+  .barcode-grid-sheet {
+    display: grid !important;
+    gap: 8mm !important;
+    padding: 10mm !important;
+    background: #fff !important;
+    color: #000 !important;
+    box-sizing: border-box;
+    width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .barcode-grid-sheet.cols-2 { grid-template-columns: repeat(2, 1fr) !important; }
+  .barcode-grid-sheet.cols-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .barcode-grid-sheet.cols-4 { grid-template-columns: repeat(4, 1fr) !important; }
+
+  .barcode-sticker-card {
+    border: 1px dashed #777 !important;
+    border-radius: 4px !important;
+    padding: 3mm !important;
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+    color: #000 !important;
+    page-break-inside: avoid !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide print dialogue warnings or background colors */
+  @page {
+    size: auto;
+    margin: 0;
+  }
+}

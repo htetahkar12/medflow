@@ -1,0 +1,17 @@
+{
+  "short_name": "Medflow",
+  "name": "Medflow Clinic EMR & Management System",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#090d16",
+  "theme_color": "#0ea5e9",
+  "display": "standalone",
+  "orientation": "any"
+}

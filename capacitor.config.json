@@ -1,0 +1,6 @@
+{
+  "appId": "com.medflow.clinic",
+  "appName": "Medflow",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}
