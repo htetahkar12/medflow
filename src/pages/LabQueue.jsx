@@ -256,20 +256,20 @@ export default function LabQueue() {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="mobile-scroll-tabs no-print" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+      <div className="tab-button-group no-print">
         <button 
           onClick={() => { setActiveTab('pending'); setSelectedPatient(null); }}
           className={`btn ${activeTab === 'pending' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600', flexShrink: 0 }}
+          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600' }}
         >
           ⏱️ Active Pending Queue ({pendingInvestigations.length})
         </button>
         <button 
           onClick={() => { setActiveTab('external'); setSelectedPatient(null); }}
           className={`btn ${activeTab === 'external' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600', flexShrink: 0 }}
+          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600' }}
         >
-          📋 External Referrals ({completedInvestigations.length})
+          📋 Completed & External Referrals ({completedInvestigations.length})
         </button>
       </div>
 

@@ -517,6 +517,24 @@ input:focus, select:focus, textarea:focus {
   display: none;
 }
 
+.tab-button-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .tab-button-group {
+    flex-direction: column !important;
+  }
+  .tab-button-group button {
+    width: 100% !important;
+  }
+}
+
 /* Top Control Bar for Clinic Scale and Duty Doctor */
 .top-control-bar {
   display: flex;
