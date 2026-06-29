@@ -275,7 +275,7 @@ export default function ClinicalReportPDF({
         @media print {
           @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 0mm !important;
           }
 
           .no-print {
@@ -287,6 +287,7 @@ export default function ClinicalReportPDF({
             color: #000 !important;
             margin: 0 !important;
             padding: 0 !important;
+            counter-reset: page 1;
           }
 
           .modal-overlay {
@@ -315,7 +316,7 @@ export default function ClinicalReportPDF({
             position: relative !important;
             display: block !important;
             width: 100% !important;
-            padding: 18mm 15mm 20mm 15mm !important;
+            padding: 24mm 15mm 20mm 15mm !important;
             margin: 0 auto !important;
             background: #fff !important;
             color: #0f172a !important;
@@ -334,12 +335,12 @@ export default function ClinicalReportPDF({
             top: 6mm !important;
             left: 15mm !important;
             right: 15mm !important;
-            height: 22px !important;
-            line-height: 22px !important;
+            height: 20px !important;
+            line-height: 20px !important;
             text-align: center !important;
             font-size: 8.5pt !important;
             font-weight: 800 !important;
-            color: #0f172a !important;
+            color: #0284c7 !important;
             letter-spacing: 0.05em !important;
             text-transform: uppercase !important;
             border-bottom: 1.5px solid #0284c7 !important;
@@ -368,7 +369,7 @@ export default function ClinicalReportPDF({
           }
 
           .page-number-counter::after {
-            content: "Page " counter(page) " of " counter(pages);
+            content: "Page " counter(page);
             font-weight: 700;
             color: #0284c7;
           }

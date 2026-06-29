@@ -811,9 +811,9 @@ input:focus, select:focus, textarea:focus {
     box-sizing: border-box !important;
   }
 
-  /* Hide print dialogue warnings or background colors */
+  /* Suppress default browser print headers and footers (URL, Date) */
   @page {
-    size: auto;
-    margin: 0;
+    size: A4 portrait;
+    margin: 0mm !important;
   }
 }
