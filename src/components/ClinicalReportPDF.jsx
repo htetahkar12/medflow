@@ -11,7 +11,11 @@ export default function ClinicalReportPDF({
   const [recommendation, setRecommendation] = useState('');
 
   const handlePrint = () => {
-    window.print();
+    if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
+      window.AndroidPrintBridge.printPage();
+    } else {
+      window.print();
+    }
   };
 
   const formattedDate = consultation?.timestamp 
@@ -22,27 +26,27 @@ export default function ClinicalReportPDF({
     : new Date().toLocaleString();
 
   return (
-    <div className="modal-overlay" style={{ background: 'rgba(15, 23, 42, 0.85)', zIndex: 99999 }}>
-      <div className="modal-content no-print-modal-box" style={{ maxWidth: '850px', width: '95%', maxHeight: '92vh', overflowY: 'auto', background: '#fff', color: '#0f172a', padding: '0', borderRadius: '12px' }}>
+    <div className="modal-overlay" style={{ background: 'rgba(15, 23, 42, 0.85)', zIndex: 99999, padding: '0.5rem' }}>
+      <div className="modal-content no-print-modal-box" style={{ maxWidth: '850px', width: '100%', maxHeight: '95vh', overflowY: 'auto', background: '#fff', color: '#0f172a', padding: '0', borderRadius: '12px' }}>
         
         {/* Control Bar (Hidden on Print) */}
-        <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', background: '#1e293b', color: '#fff', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
+        <div className="no-print" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', padding: '0.85rem 1.25rem', background: '#1e293b', color: '#fff', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
           <div>
-            <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700' }}>📄 Clinical Medical Summary Certificate (A4)</h3>
-            <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Preview before printing or saving as PDF</span>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700' }}>📄 Clinical Medical Summary Certificate (A4)</h3>
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Preview before printing or saving as PDF</span>
           </div>
-          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            <button onClick={handlePrint} className="btn btn-primary" style={{ padding: '0.4rem 1.25rem', fontWeight: '700', fontSize: '0.9rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+            <button onClick={handlePrint} className="btn btn-primary" style={{ padding: '0.4rem 1rem', fontWeight: '700', fontSize: '0.85rem' }}>
               🖨️ Print / Save as PDF
             </button>
-            <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem' }}>
+            <button onClick={onClose} className="btn btn-secondary" style={{ padding: '0.4rem 0.75rem', fontSize: '0.85rem' }}>
               ✕ Close
             </button>
           </div>
         </div>
 
         {/* Doctor Recommendation Input Bar (Hidden on Print) */}
-        <div className="no-print" style={{ padding: '1rem 1.5rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+        <div className="no-print" style={{ padding: '0.85rem 1.25rem', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
           <label style={{ fontWeight: '700', fontSize: '0.85rem', display: 'block', marginBottom: '0.35rem', color: '#334155' }}>
             ✏️ Doctor's Additional Recommendation & Special Instructions (Optional):
           </label>
@@ -55,56 +59,57 @@ export default function ClinicalReportPDF({
           />
         </div>
 
-        {/* Printable A4 Document Body */}
-        <div className="printable-a4-document print-area" style={{ padding: '2.5rem 3rem', fontFamily: 'Inter, Arial, sans-serif', color: '#0f172a', background: '#fff' }}>
-          
-          {/* Running Header (Appears on every printed page) */}
-          <div className="print-running-header">
-            MEDFLOW CLINIC MANAGEMENT SYSTEM : POWERED BY VITALYX MEDTECH
-          </div>
+        {/* Printable A4 Document Body Container */}
+        <div style={{ overflowX: 'auto', width: '100%', padding: '0.5rem' }}>
+          <div className="printable-a4-document print-area" style={{ minWidth: '300px', width: '100%', padding: '1.5rem 1.5rem', fontFamily: 'Inter, Arial, sans-serif', color: '#0f172a', background: '#fff', boxSizing: 'border-box' }}>
+            
+            {/* Running Header (Appears on every printed page) */}
+            <div className="print-running-header">
+              MEDFLOW CLINIC MANAGEMENT SYSTEM : POWERED BY VITALYX MEDTECH
+            </div>
 
-          {/* Running Footer (Appears on every printed page) */}
-          <div className="print-running-footer">
-            <div>Patient ID: <strong>{patient?.id || 'N/A'}</strong></div>
-            <div className="page-number-counter"></div>
-          </div>
-          
-          {/* Header / Letterhead */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #0284c7', paddingBottom: '1rem', marginBottom: '1.25rem', marginTop: '0.5rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <img 
-                src={clinicConfig?.logo_base64 || "./logo.png"} 
-                alt="Clinic Logo" 
-                style={{ height: '65px', width: 'auto', maxWidth: '150px', objectFit: 'contain' }} 
-              />
-              <div>
-                <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: '800', color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
-                  {clinicConfig?.clinic_name || 'MEDFLOW CLINIC'}
-                </h1>
-                <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.85rem', color: '#475569' }}>
-                  {clinicConfig?.address || 'Yangon, Myanmar'}
-                </p>
-                <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.85rem', color: '#475569' }}>
-                  <strong>Ph:</strong> {clinicConfig?.phone || 'N/A'} {clinicConfig?.email ? ` | Email: ${clinicConfig.email}` : ''}
-                </p>
+            {/* Running Footer (Appears on every printed page) */}
+            <div className="print-running-footer">
+              <div>Patient ID: <strong>{patient?.id || 'N/A'}</strong></div>
+              <div className="page-number-counter"></div>
+            </div>
+            
+            {/* Header / Letterhead */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', borderBottom: '2.5px solid #0284c7', paddingBottom: '1rem', marginBottom: '1.25rem', marginTop: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <img 
+                  src={clinicConfig?.logo_base64 || "./logo.png"} 
+                  alt="Clinic Logo" 
+                  style={{ height: '60px', width: 'auto', maxWidth: '140px', objectFit: 'contain' }} 
+                />
+                <div>
+                  <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '800', color: '#0284c7', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                    {clinicConfig?.clinic_name || 'MEDFLOW CLINIC'}
+                  </h1>
+                  <p style={{ margin: '0.2rem 0 0 0', fontSize: '0.82rem', color: '#475569' }}>
+                    {clinicConfig?.address || 'Yangon, Myanmar'}
+                  </p>
+                  <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.82rem', color: '#475569' }}>
+                    <strong>Ph:</strong> {clinicConfig?.phone || 'N/A'} {clinicConfig?.email ? ` | Email: ${clinicConfig.email}` : ''}
+                  </p>
+                </div>
+              </div>
+              <div style={{ textAlign: 'left' }}>
+                <span style={{ display: 'inline-block', background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '4px', fontWeight: '700', fontSize: '0.82rem', marginBottom: '0.35rem' }}>
+                  MEDICAL SUMMARY
+                </span>
+                <p style={{ margin: 0, fontSize: '0.78rem', color: '#64748b' }}><strong>Visit Date:</strong> {formattedDate}</p>
+                <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.78rem', color: '#64748b' }}><strong>Report ID:</strong> {consultation?.id || 'CS-REC'}</p>
               </div>
             </div>
-            <div style={{ textAlign: 'right' }}>
-              <span style={{ display: 'inline-block', background: '#e0f2fe', color: '#0369a1', padding: '0.25rem 0.75rem', borderRadius: '4px', fontWeight: '700', fontSize: '0.85rem', marginBottom: '0.35rem' }}>
-                MEDICAL SUMMARY
-              </span>
-              <p style={{ margin: 0, fontSize: '0.8rem', color: '#64748b' }}><strong>Visit Date:</strong> {formattedDate}</p>
-              <p style={{ margin: '0.1rem 0 0 0', fontSize: '0.8rem', color: '#64748b' }}><strong>Report ID:</strong> {consultation?.id || 'CS-REC'}</p>
-            </div>
-          </div>
 
-          {/* Patient Profile Metadata Bar */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '0.75rem', background: '#f1f5f9', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '1.5rem', fontSize: '0.85rem' }}>
-            <div><strong>Patient Name:</strong> <span style={{ color: '#0f172a', fontWeight: '700' }}>{patient?.name || 'N/A'}</span></div>
-            <div><strong>Patient ID:</strong> {patient?.id || 'N/A'}</div>
-            <div><strong>Age / Gender:</strong> {patient?.age || 'N/A'} Yrs / {patient?.gender || 'N/A'}</div>
-            <div><strong>Blood Group:</strong> {patient?.blood_group || 'N/A'}</div>
-          </div>
+            {/* Patient Profile Metadata Bar */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.75rem', background: '#f1f5f9', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '1.25rem', fontSize: '0.82rem' }}>
+              <div><strong>Patient Name:</strong> <span style={{ color: '#0f172a', fontWeight: '700', display: 'block' }}>{patient?.name || 'N/A'}</span></div>
+              <div><strong>Patient ID:</strong> <span style={{ display: 'block' }}>{patient?.id || 'N/A'}</span></div>
+              <div><strong>Age / Gender:</strong> <span style={{ display: 'block' }}>{patient?.age || 'N/A'} Yrs / {patient?.gender || 'N/A'}</span></div>
+              <div><strong>Blood Group:</strong> <span style={{ display: 'block' }}>{patient?.blood_group || 'N/A'}</span></div>
+            </div>
 
           {/* Vitals Summary Strip */}
           {triage && (
@@ -257,6 +262,7 @@ export default function ClinicalReportPDF({
             </div>
           </div>
 
+          </div>
         </div>
       </div>
 
