@@ -56,7 +56,7 @@ export default function ClinicalReportPDF({
         </div>
 
         {/* Printable A4 Document Body */}
-        <div className="printable-a4-document" style={{ padding: '2.5rem 3rem', fontFamily: 'Inter, Arial, sans-serif', color: '#0f172a', background: '#fff' }}>
+        <div className="printable-a4-document print-area" style={{ padding: '2.5rem 3rem', fontFamily: 'Inter, Arial, sans-serif', color: '#0f172a', background: '#fff' }}>
           
           {/* Header / Letterhead */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #0284c7', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
@@ -259,8 +259,12 @@ export default function ClinicalReportPDF({
       {/* Embedded Print CSS for exact A4 rendering */}
       <style>{`
         @media print {
-          body * {
-            visibility: hidden !important;
+          .no-print {
+            display: none !important;
+          }
+          body {
+            background: #fff !important;
+            color: #000 !important;
           }
           .modal-overlay {
             position: absolute !important;
@@ -270,6 +274,8 @@ export default function ClinicalReportPDF({
             height: auto !important;
             background: #fff !important;
             z-index: 999999 !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
           .no-print-modal-box {
             max-width: 100% !important;
@@ -278,9 +284,7 @@ export default function ClinicalReportPDF({
             overflow: visible !important;
             box-shadow: none !important;
             border-radius: 0 !important;
-          }
-          .printable-a4-document, .printable-a4-document * {
-            visibility: visible !important;
+            background: #fff !important;
           }
           .printable-a4-document {
             position: absolute !important;
@@ -290,10 +294,12 @@ export default function ClinicalReportPDF({
             padding: 15mm 15mm !important;
             margin: 0 !important;
             background: #fff !important;
-            color: #000 !important;
+            color: #0f172a !important;
+            visibility: visible !important;
+            box-sizing: border-box !important;
           }
-          .no-print {
-            display: none !important;
+          .printable-a4-document * {
+            visibility: visible !important;
           }
         }
       `}</style>
