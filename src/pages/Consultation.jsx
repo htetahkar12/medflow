@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { db } from '../db/IndexedDB';
 import { syncManager } from '../db/SyncManager';
+import ClinicalReportPDF from '../components/ClinicalReportPDF';
 
 export default function Consultation({ clinicMode, dutyDoctorId }) {
   const [activeQueue, setActiveQueue] = useState([]);
   const [activeDoctor, setActiveDoctor] = useState('');
   const [doctorsList, setDoctorsList] = useState([]);
+  const [clinicConfig, setClinicConfig] = useState(null);
+  const [pdfReportConsult, setPdfReportConsult] = useState(null);
 
   useEffect(() => {
     if ((clinicMode === 'solo_gp' || clinicMode === 'standard_gp') && dutyDoctorId) {
@@ -136,7 +139,15 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
     loadDoctors();
     loadInventory();
     loadInvestigationsCatalog();
+    loadClinicConfig();
   }, []);
+
+  const loadClinicConfig = async () => {
+    try {
+      const config = await db.get('settings', 'clinic_config');
+      setClinicConfig(config);
+    } catch (e) {}
+  };
 
   const loadInvestigationsCatalog = async () => {
     try {
@@ -1128,7 +1139,33 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
             </div>
 
             {/* Actions */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', flexWrap: 'wrap' }}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  const currentDoc = doctorsList.find(d => d.id === activeDoctor);
+                  setPdfReportConsult({
+                    consultation: {
+                      id: `CS-${selectedBooking.id}`,
+                      symptoms: emrForm.symptoms,
+                      history: emrForm.history,
+                      examination: emrForm.examination,
+                      diagnosis: emrForm.diagnosis,
+                      prescriptions: emrForm.prescribed_medicines,
+                      investigations: currentInvestigations,
+                      doctor_signature: signatureUrl,
+                      timestamp: new Date().toISOString()
+                    },
+                    patient: patientData,
+                    doctor: currentDoc,
+                    triage: triageData
+                  });
+                }} 
+                className="btn btn-primary"
+                style={{ fontWeight: '700' }}
+              >
+                📄 Generate Printable A4 Medical Certificate
+              </button>
               <button type="button" onClick={() => setSelectedBooking(null)} className="btn btn-secondary">
                 Cancel
               </button>
@@ -1143,6 +1180,18 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
           </div>
         )}
       </div>
+
+      {/* Printable A4 Medical Summary Certificate Modal */}
+      {pdfReportConsult && (
+        <ClinicalReportPDF
+          consultation={pdfReportConsult.consultation}
+          patient={pdfReportConsult.patient}
+          doctor={pdfReportConsult.doctor}
+          triage={pdfReportConsult.triage}
+          clinicConfig={clinicConfig}
+          onClose={() => setPdfReportConsult(null)}
+        />
+      )}
     </div>
   );
 }

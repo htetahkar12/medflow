@@ -8,7 +8,9 @@ export default function Settings() {
   const [clinicConfig, setClinicConfig] = useState({
     clinic_name: 'AURA CLINIC',
     address: 'Yangon, Myanmar',
-    phone: '09-xxxxxxxxx'
+    phone: '09-xxxxxxxxx',
+    email: 'info@auraclinic.com',
+    logo_base64: ''
   });
   
   const [doctorsList, setDoctorsList] = useState([]);
@@ -26,6 +28,8 @@ export default function Settings() {
   const [editingDoctor, setEditingDoctor] = useState(null);
   const [doctorForm, setDoctorForm] = useState({
     name: '',
+    qualification: '',
+    rank: '',
     specialty: 'General Physician',
     fees: 10000,
     paymentType: 'percentage',
@@ -94,7 +98,9 @@ export default function Settings() {
         setClinicConfig({
           clinic_name: config.clinic_name || 'AURA CLINIC',
           address: config.address || 'Yangon, Myanmar',
-          phone: config.phone || '09-xxxxxxxxx'
+          phone: config.phone || '09-xxxxxxxxx',
+          email: config.email || '',
+          logo_base64: config.logo_base64 || ''
         });
       }
 
@@ -153,7 +159,9 @@ export default function Settings() {
         clinic_id: clinicId,
         clinic_name: clinicConfig.clinic_name,
         address: clinicConfig.address,
-        phone: clinicConfig.phone
+        phone: clinicConfig.phone,
+        email: clinicConfig.email,
+        logo_base64: clinicConfig.logo_base64
       });
       window.dispatchEvent(new Event('aura_data_mutated'));
       alert('Clinic Profile configurations saved successfully!');
@@ -166,6 +174,8 @@ export default function Settings() {
     setEditingDoctor(null);
     setDoctorForm({
       name: '',
+      qualification: '',
+      rank: '',
       specialty: 'General Physician',
       fees: 10000,
       paymentType: 'percentage',
@@ -178,6 +188,8 @@ export default function Settings() {
     setEditingDoctor(doc);
     setDoctorForm({
       name: doc.name,
+      qualification: doc.qualification || '',
+      rank: doc.rank || '',
       specialty: doc.specialty || 'General Physician',
       fees: doc.fees || 10000,
       paymentType: doc.paymentType || 'percentage',
@@ -207,6 +219,8 @@ export default function Settings() {
         id: docId,
         clinic_id: clinicId,
         name: doctorForm.name,
+        qualification: doctorForm.qualification,
+        rank: doctorForm.rank,
         specialty: doctorForm.specialty,
         fees: Number(doctorForm.fees) || 0,
         paymentType: doctorForm.paymentType,
@@ -365,6 +379,43 @@ export default function Settings() {
             🏥 Clinic Profile Information
           </h2>
           <form onSubmit={handleSaveProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {/* Logo Upload */}
+            <div className="form-group">
+              <label>Clinic Custom Logo (Header & Letterhead)</label>
+              <input 
+                type="file" 
+                accept="image/*"
+                onChange={e => {
+                  const file = e.target.files[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setClinicConfig(prev => ({ ...prev, logo_base64: reader.result }));
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                style={{ padding: '0.35rem 0.5rem', minHeight: 'auto' }}
+              />
+              {clinicConfig.logo_base64 && (
+                <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', background: 'var(--bg-app)', padding: '0.5rem', borderRadius: '8px' }}>
+                  <img 
+                    src={clinicConfig.logo_base64} 
+                    alt="Clinic Logo Preview" 
+                    style={{ maxHeight: '45px', maxWidth: '120px', objectFit: 'contain' }} 
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setClinicConfig(prev => ({ ...prev, logo_base64: '' }))}
+                    className="btn btn-danger"
+                    style={{ padding: '0.2rem 0.5rem', fontSize: '0.75rem', minHeight: '26px' }}
+                  >
+                    Remove Logo
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="form-group">
               <label>Clinic Trade Name</label>
               <input 
@@ -381,6 +432,15 @@ export default function Settings() {
                 required
                 value={clinicConfig.phone}
                 onChange={e => setClinicConfig({ ...clinicConfig, phone: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label>Clinic Email (Optional)</label>
+              <input 
+                type="email"
+                placeholder="e.g. info@clinic.com"
+                value={clinicConfig.email || ''}
+                onChange={e => setClinicConfig({ ...clinicConfig, email: e.target.value })}
               />
             </div>
             <div className="form-group">
@@ -696,11 +756,29 @@ export default function Settings() {
                   />
                 </div>
                 <div className="form-group">
+                  <label>Medical Qualifications (Degrees) (Optional)</label>
+                  <input 
+                    type="text"
+                    placeholder="e.g. M.B.,B.S (Ygn), M.Med.Sc (Pediatrics)"
+                    value={doctorForm.qualification || ''}
+                    onChange={e => setDoctorForm({ ...doctorForm, qualification: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Official Rank / Title (Optional)</label>
+                  <input 
+                    type="text"
+                    placeholder="e.g. Consultant Physician, Senior GP"
+                    value={doctorForm.rank || ''}
+                    onChange={e => setDoctorForm({ ...doctorForm, rank: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
                   <label>Specialty / Department *</label>
                   <input 
                     type="text"
                     required
-                    placeholder="e.g. Pediatrician, Dentist"
+                    placeholder="e.g. Pediatrician, General Practitioner"
                     value={doctorForm.specialty}
                     onChange={e => setDoctorForm({ ...doctorForm, specialty: e.target.value })}
                   />

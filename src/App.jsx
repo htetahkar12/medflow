@@ -27,9 +27,17 @@ function App() {
   const [licenseLoading, setLicenseLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [clinicConfig, setClinicConfig] = useState(null);
   const [dutyDoctorId, setDutyDoctorId] = useState(() => {
     return localStorage.getItem('aura_duty_doctor_id') || '';
   });
+
+  const loadClinicConfig = async () => {
+    try {
+      const config = await db.get('settings', 'clinic_config');
+      setClinicConfig(config);
+    } catch (e) {}
+  };
 
   // Set initial theme, document attribute, check license, and check auth session
   useEffect(() => {
@@ -37,6 +45,7 @@ function App() {
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
     checkLicense();
+    loadClinicConfig();
 
     async function checkAuth() {
       if (localStorage.getItem('e2e_test_mode') === 'true') {
@@ -103,6 +112,7 @@ function App() {
     const handleMutatedData = () => {
       loadDoctors();
       checkLicense();
+      loadClinicConfig();
     };
     window.addEventListener('aura_data_mutated', handleMutatedData);
     return () => window.removeEventListener('aura_data_mutated', handleMutatedData);
@@ -197,7 +207,7 @@ function App() {
           </svg>
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <img src="./logo.png" alt="Medflow Logo" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+          <img src={clinicConfig?.logo_base64 || "./logo.png"} alt="Medflow Logo" style={{ width: '28px', height: '28px', borderRadius: '6px', objectFit: 'contain' }} />
           <span className="sidebar-logo" style={{ fontSize: '1.2rem', fontWeight: '800' }}>Medflow</span>
         </div>
         <button onClick={toggleTheme} className="mobile-menu-btn">

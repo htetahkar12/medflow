@@ -106,7 +106,7 @@ export default function Navigation({
         {/* Sidebar Logo Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.25rem 1rem', borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img src="./logo.png" alt="Medflow Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src={clinicConfig?.logo_base64 || "./logo.png"} alt="Medflow Logo" style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'contain' }} />
             <span className="sidebar-logo">Medflow</span>
           </div>
           <button 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../db/IndexedDB';
 import { syncManager } from '../db/SyncManager';
 import PatientIDCard from '../components/PatientIDCard';
+import ClinicalReportPDF from '../components/ClinicalReportPDF';
 
 const MaleSilhouette = () => (
   <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', display: 'block', background: '#38bdf8' }}>
@@ -78,6 +79,18 @@ export default function Patients() {
   
   // ID Card printing state
   const [idCardPatient, setIdCardPatient] = useState(null);
+  const [pdfReportData, setPdfReportData] = useState(null);
+
+  const openPdfReport = async (consultRecord) => {
+    const doctors = await db.getAll('doctors');
+    const doc = doctors.find(d => d.id === consultRecord.doctor_id);
+    setPdfReportData({
+      consultation: consultRecord,
+      patient: selectedPatient,
+      doctor: doc || { name: consultRecord.doctorName },
+      triage: consultRecord.triage
+    });
+  };
 
   // Investigation Result Editing state for medical history sheet
   const [editingInvTest, setEditingInvTest] = useState(null);
@@ -398,9 +411,19 @@ export default function Patients() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '350px', overflowY: 'auto' }}>
                   {patientConsultations.map(c => (
                     <div key={c.id} style={{ border: '1px solid var(--border-color)', borderRadius: '10px', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-                        <strong>Consultant: {c.doctorName}</strong>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.id.split('-').slice(-1)[0]}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                        <div>
+                          <strong>Consultant: {c.doctorName}</strong>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>({c.id.split('-').slice(-1)[0]})</span>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => openPdfReport(c)}
+                          className="btn btn-primary"
+                          style={{ padding: '0.2rem 0.6rem', fontSize: '0.75rem', minHeight: '26px' }}
+                        >
+                          📄 Print A4 Medical Certificate
+                        </button>
                       </div>
                       
                       {c.triage && (
@@ -689,6 +712,18 @@ export default function Patients() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Printable A4 Medical Summary Certificate Modal */}
+      {pdfReportData && (
+        <ClinicalReportPDF
+          consultation={pdfReportData.consultation}
+          patient={pdfReportData.patient}
+          doctor={pdfReportData.doctor}
+          triage={pdfReportData.triage}
+          clinicConfig={clinicConfig}
+          onClose={() => setPdfReportData(null)}
+        />
       )}
     </div>
   );
