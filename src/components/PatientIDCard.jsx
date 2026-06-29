@@ -82,12 +82,16 @@ export default function PatientIDCard({ patient, clinicConfig, onClose }) {
   if (!patient) return null;
 
   const handlePrint = () => {
-    window.print();
+    if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
+      window.AndroidPrintBridge.printPage();
+    } else {
+      window.print();
+    }
   };
 
   return (
-    <div className="modal-overlay no-print" style={{ zIndex: 1100 }}>
-      <div className="modal-content" style={{ maxWidth: '420px' }}>
+    <div className="modal-overlay" style={{ zIndex: 1100 }}>
+      <div className="modal-content no-print" style={{ maxWidth: '420px', width: '95%' }}>
         <div className="modal-header">
           <h3>Patient ID Card Issuing</h3>
           <button className="mobile-menu-btn" onClick={onClose} style={{ color: 'var(--text-primary)' }}>
@@ -101,6 +105,7 @@ export default function PatientIDCard({ patient, clinicConfig, onClose }) {
           
           {/* Card Frame (Visual Representation) */}
           <div className="id-card-print" style={{
+            maxWidth: '100%',
             width: '320px',
             height: '200px',
             background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
