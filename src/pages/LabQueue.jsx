@@ -256,20 +256,20 @@ export default function LabQueue() {
       </header>
 
       {/* Navigation Tabs */}
-      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }} className="no-print">
+      <div className="mobile-scroll-tabs no-print" style={{ marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
         <button 
           onClick={() => { setActiveTab('pending'); setSelectedPatient(null); }}
           className={`btn ${activeTab === 'pending' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ minHeight: '38px', padding: '0.5rem 1.25rem', fontWeight: '600' }}
+          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600', flexShrink: 0 }}
         >
           ⏱️ Active Pending Queue ({pendingInvestigations.length})
         </button>
         <button 
           onClick={() => { setActiveTab('external'); setSelectedPatient(null); }}
           className={`btn ${activeTab === 'external' ? 'btn-primary' : 'btn-secondary'}`}
-          style={{ minHeight: '38px', padding: '0.5rem 1.25rem', fontWeight: '600' }}
+          style={{ minHeight: '38px', padding: '0.5rem 1rem', fontWeight: '600', flexShrink: 0 }}
         >
-          📋 Completed & External Referrals ({completedInvestigations.length})
+          📋 External Referrals ({completedInvestigations.length})
         </button>
       </div>
 
@@ -280,15 +280,15 @@ export default function LabQueue() {
         <div className="glass-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
             <h2 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>
-              {activeTab === 'pending' ? 'Pending In-House Orders' : 'Completed / External Diagnostic Records'}
+              {activeTab === 'pending' ? 'Pending In-House Orders' : 'Completed / External Records'}
             </h2>
             {activeTab === 'external' && (
               <input 
                 type="text" 
-                placeholder="🔍 Search patient name, ID, date..."
+                placeholder="🔍 Search patient name, ID..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ minHeight: '34px', padding: '0.25rem 0.75rem', fontSize: '0.85rem', width: '220px' }}
+                style={{ minHeight: '34px', padding: '0.25rem 0.75rem', fontSize: '0.85rem', flex: '1 1 160px', maxWidth: '100%' }}
               />
             )}
           </div>
