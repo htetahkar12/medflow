@@ -58,8 +58,19 @@ export default function ClinicalReportPDF({
         {/* Printable A4 Document Body */}
         <div className="printable-a4-document print-area" style={{ padding: '2.5rem 3rem', fontFamily: 'Inter, Arial, sans-serif', color: '#0f172a', background: '#fff' }}>
           
+          {/* Running Header (Appears on every printed page) */}
+          <div className="print-running-header">
+            MEDFLOW CLINIC MANAGEMENT SYSTEM : POWERED BY VITALYX MEDTECH
+          </div>
+
+          {/* Running Footer (Appears on every printed page) */}
+          <div className="print-running-footer">
+            <div>Patient ID: <strong>{patient?.id || 'N/A'}</strong></div>
+            <div className="page-number-counter"></div>
+          </div>
+          
           {/* Header / Letterhead */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #0284c7', paddingBottom: '1rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2.5px solid #0284c7', paddingBottom: '1rem', marginBottom: '1.25rem', marginTop: '0.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <img 
                 src={clinicConfig?.logo_base64 || "./logo.png"} 
@@ -246,26 +257,30 @@ export default function ClinicalReportPDF({
             </div>
           </div>
 
-          {/* Very End System Footer */}
-          <div style={{ marginTop: '2rem', textAlign: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '0.5rem' }}>
-            <p style={{ margin: 0, fontSize: '0.72rem', color: '#94a3b8', letterSpacing: '0.02em', textTransform: 'uppercase', fontWeight: '600' }}>
-              MedFlow Clinic Management System : Powered by Vitalyx Medtech
-            </p>
-          </div>
-
         </div>
       </div>
 
       {/* Embedded Print CSS for exact A4 rendering */}
       <style>{`
+        .print-running-header, .print-running-footer {
+          display: none;
+        }
+
         @media print {
+          @page {
+            size: A4;
+            margin: 15mm 15mm 15mm 15mm;
+          }
+
           .no-print {
             display: none !important;
           }
+
           body {
             background: #fff !important;
             color: #000 !important;
           }
+
           .modal-overlay {
             position: absolute !important;
             left: 0 !important;
@@ -277,6 +292,7 @@ export default function ClinicalReportPDF({
             padding: 0 !important;
             margin: 0 !important;
           }
+
           .no-print-modal-box {
             max-width: 100% !important;
             width: 100% !important;
@@ -286,19 +302,62 @@ export default function ClinicalReportPDF({
             border-radius: 0 !important;
             background: #fff !important;
           }
+
           .printable-a4-document {
             position: static !important;
             display: block !important;
             width: 100% !important;
-            padding: 15mm 15mm !important;
+            padding: 10mm 5mm 10mm 5mm !important;
             margin: 0 auto !important;
             background: #fff !important;
             color: #0f172a !important;
             visibility: visible !important;
             box-sizing: border-box !important;
           }
+
           .printable-a4-document * {
             visibility: visible !important;
+          }
+
+          /* Running Header on All Pages */
+          .print-running-header {
+            display: block !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 18px !important;
+            text-align: center !important;
+            font-size: 7.5pt !important;
+            font-weight: 700 !important;
+            color: #475569 !important;
+            letter-spacing: 0.04em !important;
+            text-transform: uppercase !important;
+            border-bottom: 1px solid #cbd5e1 !important;
+            background: #fff !important;
+            padding-bottom: 2px !important;
+          }
+
+          /* Running Footer on All Pages */
+          .print-running-footer {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            height: 18px !important;
+            font-size: 8pt !important;
+            color: #475569 !important;
+            border-top: 1px solid #cbd5e1 !important;
+            background: #fff !important;
+            padding-top: 3px !important;
+          }
+
+          .page-number-counter::after {
+            content: "Page " counter(page) " of " counter(pages);
+            font-weight: 600;
           }
         }
       `}</style>
