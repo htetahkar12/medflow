@@ -3,7 +3,10 @@ import { db } from '../db/IndexedDB';
 import { syncManager } from '../db/SyncManager';
 
 export default function LabQueue() {
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending' | 'external'
+  const [searchQuery, setSearchQuery] = useState('');
   const [pendingInvestigations, setPendingInvestigations] = useState([]);
+  const [completedInvestigations, setCompletedInvestigations] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientTests, setPatientTests] = useState([]);
 
@@ -27,34 +30,36 @@ export default function LabQueue() {
       const allBookings = await db.getAll('bookings');
       const clinicId = syncManager.getClinicId();
 
-      // Find all pending tests for this clinic
-      const pendingTests = allInv.filter(i => i.status === 'pending' && i.clinic_id === clinicId);
+      const clinicInv = allInv.filter(i => i.clinic_id === clinicId);
       
-      // Group by patient_id
-      const uniquePatientIds = [...new Set(pendingTests.map(t => t.patient_id))];
-      
-      const queueItems = uniquePatientIds.map(pid => {
-        const patient = allPatients.find(p => p.id === pid);
-        const tests = pendingTests.filter(t => t.patient_id === pid);
-        
-        // Find booking to show slot/doctor
-        const testObj = tests[0];
-        const consultId = testObj.consultation_id;
-        const bookingId = consultId.replace('CS-', '');
-        const booking = allBookings.find(b => b.id === bookingId);
+      // Helper to group by patient_id
+      const groupTests = (tests) => {
+        const uniquePatientIds = [...new Set(tests.map(t => t.patient_id))];
+        return uniquePatientIds.map(pid => {
+          const patient = allPatients.find(p => p.id === pid);
+          const pTests = tests.filter(t => t.patient_id === pid);
+          const consultId = pTests[0]?.consultation_id || '';
+          const bookingId = consultId.replace('CS-', '');
+          const booking = allBookings.find(b => b.id === bookingId);
 
-        return {
-          patientId: pid,
-          patientName: patient ? patient.name : 'Unknown Patient',
-          patientAge: patient ? patient.age : 'N/A',
-          patientGender: patient ? patient.gender : 'N/A',
-          bookingId,
-          testCount: tests.length,
-          tests
-        };
-      });
+          return {
+            patientId: pid,
+            patientName: patient ? patient.name : 'Unknown Patient',
+            patientAge: patient ? patient.age : 'N/A',
+            patientGender: patient ? patient.gender : 'N/A',
+            bookingId,
+            bookingDate: booking ? booking.date : (pTests[0]?.recorded_at ? pTests[0].recorded_at.split('T')[0] : 'N/A'),
+            testCount: pTests.length,
+            tests: pTests
+          };
+        });
+      };
 
-      setPendingInvestigations(queueItems);
+      const pendingTests = clinicInv.filter(i => i.status === 'pending');
+      const completedTests = clinicInv.filter(i => i.status === 'completed');
+
+      setPendingInvestigations(groupTests(pendingTests));
+      setCompletedInvestigations(groupTests(completedTests));
     } catch (e) {
       console.error(e);
     }
@@ -63,19 +68,20 @@ export default function LabQueue() {
   const selectPatientQueue = (item) => {
     setSelectedPatient(item);
     
-    // Set up results input fields with default normal reference values
+    // Set up results input fields with default or existing reference values
     const formInit = {};
     item.tests.forEach(test => {
-      // Provide standard defaults
-      let refRange = 'Normal';
-      if (test.test_name.includes('CBC')) refRange = 'Hb: 12-16 g/dL, WBC: 4000-11000/uL';
-      if (test.test_name.includes('Sugar') || test.test_name.includes('FBS')) refRange = '70-100 mg/dL';
-      if (test.test_name.includes('Lipid')) refRange = 'Cholesterol < 200 mg/dL';
-      if (test.test_name.includes('LFT')) refRange = 'ALT: 7-56 U/L, AST: 10-40 U/L';
-      if (test.test_name.includes('KFT')) refRange = 'Creatinine: 0.6-1.2 mg/dL';
+      let refRange = test.normal_range || 'Normal';
+      if (!test.normal_range) {
+        if (test.test_name.includes('CBC')) refRange = 'Hb: 12-16 g/dL, WBC: 4000-11000/uL';
+        if (test.test_name.includes('Sugar') || test.test_name.includes('FBS')) refRange = '70-100 mg/dL';
+        if (test.test_name.includes('Lipid')) refRange = 'Cholesterol < 200 mg/dL';
+        if (test.test_name.includes('LFT')) refRange = 'ALT: 7-56 U/L, AST: 10-40 U/L';
+        if (test.test_name.includes('KFT')) refRange = 'Creatinine: 0.6-1.2 mg/dL';
+      }
 
       formInit[test.id] = {
-        result_value: '',
+        result_value: test.result_value || '',
         normal_range: refRange
       };
     });
@@ -110,33 +116,38 @@ export default function LabQueue() {
         await db.save('investigations', updatedTest);
       }
 
-      // 2. Check if this patient has *any other* pending tests for this booking/consultation
-      const allInv = await db.getAll('investigations');
-      const remainingPending = allInv.filter(i => 
-        i.consultation_id === `CS-${selectedPatient.bookingId}` && 
-        i.status === 'pending' && 
-        i.clinic_id === clinicId
-      );
+      if (activeTab === 'pending') {
+        // 2. Check if this patient has *any other* pending tests for this booking/consultation
+        const allInv = await db.getAll('investigations');
+        const remainingPending = allInv.filter(i => 
+          i.consultation_id === `CS-${selectedPatient.bookingId}` && 
+          i.status === 'pending' && 
+          i.clinic_id === clinicId
+        );
 
-      // If no more pending tests for this visit, forward booking status based on routing select
-      if (remainingPending.length === 0) {
-        const booking = await db.get('bookings', selectedPatient.bookingId);
-        if (booking) {
-          if (nextRouting === 'doctor') {
-            booking.status = 'checked_in'; // Send back to waiting queue
-            booking.lab_results_ready = true; // Flag for doctor
-          } else {
-            booking.status = 'pending_checkout'; // Send directly to cashier POS
-            booking.lab_results_ready = false;
+        // If no more pending tests for this visit, forward booking status based on routing select
+        if (remainingPending.length === 0) {
+          const booking = await db.get('bookings', selectedPatient.bookingId);
+          if (booking) {
+            if (nextRouting === 'doctor') {
+              booking.status = 'checked_in'; // Send back to waiting queue
+              booking.lab_results_ready = true; // Flag for doctor
+            } else {
+              booking.status = 'pending_checkout'; // Send directly to cashier POS
+              booking.lab_results_ready = false;
+            }
+            await db.save('bookings', booking);
           }
-          await db.save('bookings', booking);
         }
+
+        alert(nextRouting === 'doctor' 
+          ? 'Results saved. Patient returned to Doctor Queue for clinical re-access.' 
+          : 'Results saved. Patient forwarded to Cashier Billing POS.'
+        );
+      } else {
+        alert('External referral results successfully updated in patient medical record.');
       }
 
-      alert(nextRouting === 'doctor' 
-        ? 'Results saved. Patient returned to Doctor Queue for clinical re-access.' 
-        : 'Results saved. Patient forwarded to Cashier Billing POS.'
-      );
       setSelectedPatient(null);
       setPatientTests([]);
       setNextRouting('cashier'); // reset default
@@ -225,28 +236,73 @@ export default function LabQueue() {
     }
   };
 
+  const filteredCompleted = completedInvestigations.filter(item => {
+    const q = searchQuery.toLowerCase().trim();
+    if (!q) return true;
+    return item.patientName.toLowerCase().includes(q) ||
+           item.patientId.toLowerCase().includes(q) ||
+           item.bookingDate.includes(q);
+  });
+
+  const displayedList = activeTab === 'pending' ? pendingInvestigations : filteredCompleted;
+
   return (
     <div>
-      <header className="flex-wrap-safe no-print" style={{ marginBottom: '2rem' }}>
+      <header className="flex-wrap-safe no-print" style={{ marginBottom: '1.5rem' }}>
         <div>
           <h1 style={{ fontSize: '2rem', fontWeight: '800' }}>Lab & Radiology Investigation Room</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Review pending test orders, fill in diagnostics results, and send back to patient files</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Review pending test orders, fill in diagnostics results, and update external laboratory referrals</p>
         </div>
       </header>
+
+      {/* Navigation Tabs */}
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }} className="no-print">
+        <button 
+          onClick={() => { setActiveTab('pending'); setSelectedPatient(null); }}
+          className={`btn ${activeTab === 'pending' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ minHeight: '38px', padding: '0.5rem 1.25rem', fontWeight: '600' }}
+        >
+          ⏱️ Active Pending Queue ({pendingInvestigations.length})
+        </button>
+        <button 
+          onClick={() => { setActiveTab('external'); setSelectedPatient(null); }}
+          className={`btn ${activeTab === 'external' ? 'btn-primary' : 'btn-secondary'}`}
+          style={{ minHeight: '38px', padding: '0.5rem 1.25rem', fontWeight: '600' }}
+        >
+          📋 Completed & External Referrals ({completedInvestigations.length})
+        </button>
+      </div>
 
       {/* Main Grid */}
       <div className={selectedPatient ? "responsive-split-grid-50 no-print" : "no-print"}>
         
-        {/* Left Side: Pending Queue */}
+        {/* Left Side: Investigation Queue / Referral Lookup */}
         <div className="glass-card">
-          <h2 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1rem' }}>Pending Investigation Queue</h2>
-          {pendingInvestigations.length === 0 ? (
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <h2 style={{ fontSize: '1.2rem', fontWeight: '700', margin: 0 }}>
+              {activeTab === 'pending' ? 'Pending In-House Orders' : 'Completed / External Diagnostic Records'}
+            </h2>
+            {activeTab === 'external' && (
+              <input 
+                type="text" 
+                placeholder="🔍 Search patient name, ID, date..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{ minHeight: '34px', padding: '0.25rem 0.75rem', fontSize: '0.85rem', width: '220px' }}
+              />
+            )}
+          </div>
+
+          {displayedList.length === 0 ? (
             <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              No pending investigations currently.
+              {activeTab === 'pending' 
+                ? 'No pending investigations currently.' 
+                : 'No completed or external diagnostic records match your search.'
+              }
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {pendingInvestigations.map(item => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', maxHeight: '65vh', overflowY: 'auto' }}>
+              {displayedList.map(item => (
                 <div 
                   key={item.patientId} 
                   onClick={() => selectPatientQueue(item)}
@@ -258,10 +314,13 @@ export default function LabQueue() {
                 >
                   <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                     <strong style={{ color: selectedPatient?.patientId === item.patientId ? 'var(--primary)' : 'var(--text-primary)' }}>{item.patientName}</strong>
-                    <span className="badge badge-pending">{item.testCount} Tests Ordered</span>
+                    <span className={`badge ${activeTab === 'pending' ? 'badge-pending' : 'badge-active'}`}>
+                      {item.testCount} Tests {activeTab === 'pending' ? 'Ordered' : 'Recorded'}
+                    </span>
                   </div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    Patient ID: {item.patientId} | {item.patientGender} | {item.patientAge} Yrs
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Patient ID: {item.patientId} | {item.patientGender} | {item.patientAge} Yrs</span>
+                    <span>Date: {item.bookingDate}</span>
                   </div>
                 </div>
               ))}
@@ -369,37 +428,41 @@ export default function LabQueue() {
             </div>
 
             {/* Next Destination Workflow Selector */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--bg-app)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
-              <label style={{ fontWeight: '700', fontSize: '0.85rem' }}>Select Patient Next Destination:</label>
-              <div style={{ display: 'flex', gap: '2rem', marginTop: '0.25rem' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: '500' }}>
-                  <input 
-                    type="radio" 
-                    name="nextRouting" 
-                    value="doctor" 
-                    checked={nextRouting === 'doctor'} 
-                    onChange={() => setNextRouting('doctor')}
-                    style={{ width: '18px', height: '18px', minHeight: 'auto' }}
-                  />
-                  👨‍⚕️ Send back to Doctor (Re-access waitlist)
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: '500' }}>
-                  <input 
-                    type="radio" 
-                    name="nextRouting" 
-                    value="cashier" 
-                    checked={nextRouting === 'cashier'} 
-                    onChange={() => setNextRouting('cashier')}
-                    style={{ width: '18px', height: '18px', minHeight: 'auto' }}
-                  />
-                  💳 Send directly to Cashier POS (Checkout)
-                </label>
+            {activeTab === 'pending' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', background: 'var(--bg-app)', padding: '1rem', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
+                <label style={{ fontWeight: '700', fontSize: '0.85rem' }}>Select Patient Next Destination:</label>
+                <div style={{ display: 'flex', gap: '2rem', marginTop: '0.25rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: '500' }}>
+                    <input 
+                      type="radio" 
+                      name="nextRouting" 
+                      value="doctor" 
+                      checked={nextRouting === 'doctor'} 
+                      onChange={() => setNextRouting('doctor')}
+                      style={{ width: '18px', height: '18px', minHeight: 'auto' }}
+                    />
+                    👨‍⚕️ Send back to Doctor (Re-access waitlist)
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', color: 'var(--text-primary)', fontSize: '0.9rem', fontWeight: '500' }}>
+                    <input 
+                      type="radio" 
+                      name="nextRouting" 
+                      value="cashier" 
+                      checked={nextRouting === 'cashier'} 
+                      onChange={() => setNextRouting('cashier')}
+                      style={{ width: '18px', height: '18px', minHeight: 'auto' }}
+                    />
+                    💳 Send directly to Cashier POS (Checkout)
+                  </label>
+                </div>
               </div>
-            </div>
+            )}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid var(--border-color)', paddingTop: '1rem' }}>
               <button type="button" onClick={() => { setSelectedPatient(null); setNextRouting('cashier'); }} className="btn btn-secondary">Cancel</button>
-              <button type="submit" className="btn btn-success">Save Results & Route Patient</button>
+              <button type="submit" className="btn btn-success">
+                {activeTab === 'pending' ? 'Save Results & Route Patient' : 'Update Referral Record'}
+              </button>
             </div>
           </form>
         )}

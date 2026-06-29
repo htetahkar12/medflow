@@ -79,6 +79,39 @@ export default function Patients() {
   // ID Card printing state
   const [idCardPatient, setIdCardPatient] = useState(null);
 
+  // Investigation Result Editing state for medical history sheet
+  const [editingInvTest, setEditingInvTest] = useState(null);
+  const [invResultVal, setInvResultVal] = useState('');
+  const [invRefVal, setInvRefVal] = useState('');
+
+  const openEditInv = (test) => {
+    setEditingInvTest(test);
+    setInvResultVal(test.result_value || '');
+    setInvRefVal(test.normal_range || 'Normal');
+  };
+
+  const handleSaveInvResult = async (e) => {
+    e.preventDefault();
+    if (!editingInvTest) return;
+    try {
+      const updatedTest = {
+        ...editingInvTest,
+        status: 'completed',
+        result_value: invResultVal.trim(),
+        normal_range: invRefVal.trim(),
+        recorded_at: editingInvTest.recorded_at || new Date().toISOString()
+      };
+      await db.save('investigations', updatedTest);
+      setEditingInvTest(null);
+      if (selectedPatient) {
+        viewPatientDetails(selectedPatient);
+      }
+      alert('Diagnostic result successfully recorded in patient medical history.');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     loadPatients();
     loadClinicConfig();
@@ -389,17 +422,29 @@ export default function Patients() {
                           <strong style={{ color: 'var(--primary)' }}>🔬 Diagnostic Investigations:</strong>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.25rem', paddingLeft: '0.5rem' }}>
                             {c.investigations.map((test, idx) => (
-                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.01)', padding: '0.25rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.03)' }}>
-                                <span>{test.test_name} ({test.test_type === 'lab' ? 'Lab' : 'Radiology'})</span>
+                              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255,255,255,0.02)', padding: '0.35rem 0.6rem', borderRadius: '6px', border: '1px solid var(--border-color)', margin: '0.2rem 0' }}>
                                 <div>
+                                  <strong style={{ color: 'var(--text-primary)' }}>{test.test_name}</strong>
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '0.5rem' }}>({test.test_type === 'lab' ? 'Lab' : 'Radiology'})</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                   {test.status === 'completed' ? (
-                                    <span>
+                                    <span style={{ fontSize: '0.85rem' }}>
                                       Result: <strong style={{ color: 'var(--accent)' }}>{test.result_value}</strong> 
                                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '0.4rem' }}>({test.normal_range})</span>
                                     </span>
                                   ) : (
-                                    <span style={{ color: 'var(--warning)', fontSize: '0.8rem' }}>⚠️ Pending Results</span>
+                                    <span style={{ color: 'var(--warning)', fontSize: '0.8rem', fontWeight: '600' }}>⚠️ Pending Results</span>
                                   )}
+                                  <button 
+                                    type="button"
+                                    onClick={() => openEditInv(test)}
+                                    className="btn btn-secondary"
+                                    style={{ padding: '0.15rem 0.5rem', minHeight: '26px', fontSize: '0.75rem' }}
+                                    title="Record or update external test result"
+                                  >
+                                    ✏️ {test.status === 'completed' ? 'Edit' : 'Add Result'}
+                                  </button>
                                 </div>
                               </div>
                             ))}
@@ -599,6 +644,51 @@ export default function Patients() {
           clinicConfig={clinicConfig} 
           onClose={() => setIdCardPatient(null)} 
         />
+      )}
+
+      {/* Investigation Result Entry Modal */}
+      {editingInvTest && (
+        <div className="modal-overlay">
+          <div className="modal-content" style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h3>Record External Diagnostic Result</h3>
+              <button className="mobile-menu-btn" onClick={() => setEditingInvTest(null)} style={{ color: 'var(--text-primary)' }}>✕</button>
+            </div>
+            <form onSubmit={handleSaveInvResult}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ padding: '0.75rem', background: 'var(--bg-app)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                  <strong style={{ color: 'var(--primary)', fontSize: '1rem' }}>{editingInvTest.test_name}</strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginLeft: '0.5rem' }}>({editingInvTest.test_type === 'lab' ? 'Laboratory Test' : 'Radiology & Imaging'})</span>
+                </div>
+
+                <div className="form-group">
+                  <label>Result Findings / Value *</label>
+                  <input 
+                    type="text"
+                    required
+                    placeholder="e.g. Hb: 13.2 g/dL, or Clear, No consolidations"
+                    value={invResultVal}
+                    onChange={e => setInvResultVal(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Normal Reference Guide</label>
+                  <input 
+                    type="text"
+                    placeholder="e.g. 12.0 - 16.0 g/dL"
+                    value={invRefVal}
+                    onChange={e => setInvRefVal(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" onClick={() => setEditingInvTest(null)} className="btn btn-secondary">Cancel</button>
+                <button type="submit" className="btn btn-success">Save to Patient Record</button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   );
