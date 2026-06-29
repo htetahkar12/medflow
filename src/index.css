@@ -683,42 +683,52 @@ input:focus, select:focus, textarea:focus {
     --border-color: #333333 !important;
   }
 
-  /* Force print area text contrast and prevent background leaks */
-  .print-area, .print-area * {
+  /* Hide non-printable UI elements */
+  .no-print, nav, aside, .sidebar, .mobile-nav-toggle, header.no-print {
+    display: none !important;
+  }
+
+  body, #root, .app-layout, .main-content {
+    background: #ffffff !important;
     color: #000000 !important;
-    background-color: transparent !important;
-    border-color: #333333 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
   }
 
-  /* Hide every single element on the page */
-  body * {
-    visibility: hidden !important;
-  }
-
-  /* Make ONLY elements inside the .print-area visible */
-  .print-area, .print-area * {
-    visibility: visible !important;
-  }
-
-  /* Force the print area container to position at 0,0 and take full page width */
-  .print-area {
+  /* Modal print container rules */
+  .modal-overlay {
     position: absolute !important;
     left: 0 !important;
     top: 0 !important;
     width: 100% !important;
-    display: block !important;
-    margin: 0 !important;
+    height: auto !important;
+    background: #ffffff !important;
     padding: 0 !important;
+    margin: 0 !important;
+    z-index: 999999 !important;
+    overflow: visible !important;
   }
 
-  .only-print {
+  .modal-content, .no-print-modal-box {
+    max-width: 100% !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background: #ffffff !important;
+  }
+
+  .print-area, .print-area * {
+    visibility: visible !important;
+  }
+
+  .print-area {
     display: block !important;
-  }
-
-  body {
-    background-color: #fff !important;
-    color: #000 !important;
-    font-size: 11pt;
+    width: 100% !important;
+    margin: 0 !important;
   }
 
   /* Thermal print container (POS Receipts / Prescription snippets) */

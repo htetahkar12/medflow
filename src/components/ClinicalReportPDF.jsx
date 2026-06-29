@@ -287,12 +287,11 @@ export default function ClinicalReportPDF({
             background: #fff !important;
           }
           .printable-a4-document {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
+            position: static !important;
+            display: block !important;
             width: 100% !important;
             padding: 15mm 15mm !important;
-            margin: 0 !important;
+            margin: 0 auto !important;
             background: #fff !important;
             color: #0f172a !important;
             visibility: visible !important;
