@@ -274,8 +274,8 @@ export default function ClinicalReportPDF({
 
         @media print {
           @page {
-            size: A4;
-            margin: 15mm 15mm 15mm 15mm;
+            size: A4 portrait;
+            margin: 0;
           }
 
           .no-print {
@@ -285,6 +285,8 @@ export default function ClinicalReportPDF({
           body {
             background: #fff !important;
             color: #000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
 
           .modal-overlay {
@@ -310,10 +312,10 @@ export default function ClinicalReportPDF({
           }
 
           .printable-a4-document {
-            position: static !important;
+            position: relative !important;
             display: block !important;
             width: 100% !important;
-            padding: 10mm 5mm 10mm 5mm !important;
+            padding: 18mm 15mm 20mm 15mm !important;
             margin: 0 auto !important;
             background: #fff !important;
             color: #0f172a !important;
@@ -325,45 +327,50 @@ export default function ClinicalReportPDF({
             visibility: visible !important;
           }
 
-          /* Running Header on All Pages */
+          /* Prominent Running Header on All Pages */
           .print-running-header {
             display: block !important;
             position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 18px !important;
+            top: 6mm !important;
+            left: 15mm !important;
+            right: 15mm !important;
+            height: 22px !important;
+            line-height: 22px !important;
             text-align: center !important;
-            font-size: 7.5pt !important;
-            font-weight: 700 !important;
-            color: #475569 !important;
-            letter-spacing: 0.04em !important;
+            font-size: 8.5pt !important;
+            font-weight: 800 !important;
+            color: #0f172a !important;
+            letter-spacing: 0.05em !important;
             text-transform: uppercase !important;
-            border-bottom: 1px solid #cbd5e1 !important;
+            border-bottom: 1.5px solid #0284c7 !important;
             background: #fff !important;
-            padding-bottom: 2px !important;
+            z-index: 1000 !important;
           }
 
-          /* Running Footer on All Pages */
+          /* Clean Running Footer on All Pages (Patient ID left, Page X of Y right) */
           .print-running-footer {
             display: flex !important;
             justify-content: space-between !important;
             align-items: center !important;
             position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            height: 18px !important;
-            font-size: 8pt !important;
-            color: #475569 !important;
+            bottom: 6mm !important;
+            left: 15mm !important;
+            right: 15mm !important;
+            height: 20px !important;
+            line-height: 20px !important;
+            font-size: 8.5pt !important;
+            font-weight: 600 !important;
+            color: #334155 !important;
             border-top: 1px solid #cbd5e1 !important;
             background: #fff !important;
-            padding-top: 3px !important;
+            padding-top: 2px !important;
+            z-index: 1000 !important;
           }
 
           .page-number-counter::after {
             content: "Page " counter(page) " of " counter(pages);
-            font-weight: 600;
+            font-weight: 700;
+            color: #0284c7;
           }
         }
       `}</style>
