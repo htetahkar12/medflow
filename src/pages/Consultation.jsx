@@ -50,8 +50,8 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
     medicine_id: '',
     quantity: '10',
     dosage: '500mg',
-    route: 'PO',
-    frequency: 'BD',
+    route: 'PO (Oral)',
+    frequency: 'BD (Twice Daily)',
     duration: '5',
     instructions: 'After Meal'
   });
@@ -308,6 +308,43 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
     }
   };
 
+  // Helper to calculate total medication quantity based on dosage, frequency, and duration
+  const calculateTotalQuantity = (doseStr, freqStr, durationDaysStr) => {
+    let dailyFreq = 1;
+    const freq = freqStr || '';
+    if (freq.includes('BD')) dailyFreq = 2;
+    else if (freq.includes('TDS')) dailyFreq = 3;
+    else if (freq.includes('QDS')) dailyFreq = 4;
+    else if (freq.includes('OD') || freq.includes('hs') || freq.includes('PRN')) dailyFreq = 1;
+
+    const days = Number(durationDaysStr) || 0;
+    
+    let doseMultiplier = 1;
+    if (doseStr) {
+      const match = doseStr.trim().match(/^(\d+(\.\d+)?)\s*(tab|capsule|cap|pill|sachet)/i);
+      if (match && match[1]) {
+        doseMultiplier = parseFloat(match[1]) || 1;
+      }
+    }
+
+    return Math.max(1, Math.ceil(dailyFreq * days * doseMultiplier));
+  };
+
+  const handlePrescInputChange = (field, value) => {
+    setPrescInput(prev => {
+      const updated = { ...prev, [field]: value };
+      if (field === 'dosage' || field === 'frequency' || field === 'duration') {
+        const autoQty = calculateTotalQuantity(
+          field === 'dosage' ? value : prev.dosage,
+          field === 'frequency' ? value : prev.frequency,
+          field === 'duration' ? value : prev.duration
+        );
+        updated.quantity = String(autoQty);
+      }
+      return updated;
+    });
+  };
+
   // Prescription builder helper
   const addPrescribedMedicine = () => {
     if (!prescInput.medicine_id) {
@@ -318,15 +355,7 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
     const med = inventoryList.find(i => i.id === prescInput.medicine_id);
     if (!med) return;
 
-    // Calculate conversion math
-    // Default quantity formula e.g. frequency * duration
-    let dailyFreq = 1;
-    if (prescInput.frequency === 'BD') dailyFreq = 2;
-    if (prescInput.frequency === 'TDS') dailyFreq = 3;
-    if (prescInput.frequency === 'QDS') dailyFreq = 4;
-    
-    const durationDays = Number(prescInput.duration) || 0;
-    const computedQty = dailyFreq * durationDays;
+    const finalQty = Number(prescInput.quantity) || calculateTotalQuantity(prescInput.dosage, prescInput.frequency, prescInput.duration);
 
     const newPrescription = {
       medicine_id: med.id,
@@ -336,7 +365,7 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
       frequency: prescInput.frequency,
       duration: prescInput.duration,
       instructions: prescInput.instructions,
-      quantity: computedQty // total tablets/ml needed
+      quantity: finalQty // total tablets/ml needed
     };
 
     setEmrForm({
@@ -349,8 +378,8 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
       medicine_id: '',
       quantity: '10',
       dosage: '500mg',
-      route: 'PO',
-      frequency: 'BD',
+      route: 'PO (Oral)',
+      frequency: 'BD (Twice Daily)',
       duration: '5',
       instructions: 'After Meal'
     });
@@ -951,11 +980,10 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
                   <label>Select Drug</label>
                   <select 
                     value={prescInput.medicine_id}
-                    onChange={e => setPrescInput({...prescInput, medicine_id: e.target.value})}
+                    onChange={e => handlePrescInputChange('medicine_id', e.target.value)}
                   >
                     <option value="">-- Choose Medicine --</option>
                     {inventoryList.map(item => {
-                      // format display stock
                       const box = Math.floor(item.total_tablets / (item.strip_per_box * item.tablet_per_strip));
                       const remainingTabs = item.total_tablets % (item.strip_per_box * item.tablet_per_strip);
                       const strips = Math.floor(remainingTabs / item.tablet_per_strip);
@@ -974,12 +1002,12 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
                   <input 
                     type="text" 
                     value={prescInput.dosage}
-                    onChange={e => setPrescInput({...prescInput, dosage: e.target.value})}
+                    onChange={e => handlePrescInputChange('dosage', e.target.value)}
                   />
                 </div>
                 <div className="form-group">
                   <label>Route</label>
-                  <select value={prescInput.route} onChange={e => setPrescInput({...prescInput, route: e.target.value})}>
+                  <select value={prescInput.route} onChange={e => handlePrescInputChange('route', e.target.value)}>
                     <option>PO (Oral)</option><option>IV (Intravenous)</option>
                     <option>IM (Intramuscular)</option><option>SC (Subcutaneous)</option>
                     <option>Topical</option><option>Inhalation</option>
@@ -987,7 +1015,7 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
                 </div>
                 <div className="form-group">
                   <label>Frequency</label>
-                  <select value={prescInput.frequency} onChange={e => setPrescInput({...prescInput, frequency: e.target.value})}>
+                  <select value={prescInput.frequency} onChange={e => handlePrescInputChange('frequency', e.target.value)}>
                     <option>OD (Once Daily)</option>
                     <option>BD (Twice Daily)</option>
                     <option>TDS (Three Times Daily)</option>
@@ -1001,7 +1029,16 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
                   <input 
                     type="number" 
                     value={prescInput.duration}
-                    onChange={e => setPrescInput({...prescInput, duration: e.target.value})}
+                    onChange={e => handlePrescInputChange('duration', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Total Qty Needed (Units) *</label>
+                  <input 
+                    type="number" 
+                    value={prescInput.quantity}
+                    style={{ fontWeight: '700', color: 'var(--primary)' }}
+                    onChange={e => handlePrescInputChange('quantity', e.target.value)}
                   />
                 </div>
                 <div className="form-group" style={{ gridColumn: 'span 2' }}>
@@ -1010,10 +1047,10 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
                     type="text" 
                     value={prescInput.instructions}
                     placeholder="e.g. Before Meal, After Meal, avoid dairy..."
-                    onChange={e => setPrescInput({...prescInput, instructions: e.target.value})}
+                    onChange={e => handlePrescInputChange('instructions', e.target.value)}
                   />
                 </div>
-                <div className="form-group" style={{ justifyContent: 'flex-end' }}>
+                <div className="form-group" style={{ justifyContent: 'flex-end', gridColumn: 'span 2' }}>
                   <button type="button" onClick={addPrescribedMedicine} className="btn btn-primary" style={{ width: '100%' }}>
                     + Add Drug
                   </button>
