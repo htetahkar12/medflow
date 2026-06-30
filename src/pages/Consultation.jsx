@@ -186,7 +186,10 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
     const clinicId = syncManager.getClinicId();
     const clinicDocs = list.filter(d => d.clinic_id === clinicId);
     setDoctorsList(clinicDocs);
-    if (clinicDocs.length > 0) {
+    const savedDuty = localStorage.getItem('aura_duty_doctor_id') || dutyDoctorId;
+    if (savedDuty && clinicDocs.some(d => d.id === savedDuty)) {
+      setActiveDoctor(savedDuty);
+    } else if (clinicDocs.length > 0) {
       setActiveDoctor(clinicDocs[0].id);
     }
   };
@@ -604,27 +607,20 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
         {/* Doctor selector */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <label style={{ margin: 0 }}>Practitioner:</label>
-          {clinicMode === 'solo_gp' || clinicMode === 'standard_gp' ? (
-            (() => {
-              const activeDocObj = doctorsList.find(d => d.id === activeDoctor);
-              return (
-                <strong style={{ color: 'var(--primary)', fontSize: '1.05rem' }}>
-                  {activeDocObj ? `${activeDocObj.name} (${activeDocObj.specialty})` : 'No doctor on duty'}
-                </strong>
-              );
-            })()
-          ) : (
-            <select 
-              value={activeDoctor} 
-              onChange={(e) => setActiveDoctor(e.target.value)}
-              style={{ width: 'auto', minHeight: '38px', padding: '0.5rem 1rem' }}
-            >
-              <option value="">-- Select Doctor --</option>
-              {doctorsList.map(d => (
-                <option key={d.id} value={d.id}>{d.name} ({d.specialty})</option>
-              ))}
-            </select>
-          )}
+          <select 
+            value={activeDoctor} 
+            onChange={(e) => {
+              setActiveDoctor(e.target.value);
+              localStorage.setItem('aura_duty_doctor_id', e.target.value);
+              window.dispatchEvent(new Event('aura_data_mutated'));
+            }}
+            style={{ width: 'auto', minHeight: '38px', padding: '0.35rem 1rem', borderRadius: '8px', border: '1px solid var(--primary)', background: 'var(--bg-card)', color: 'var(--text-primary)', fontWeight: '600' }}
+          >
+            <option value="">-- Select Doctor --</option>
+            {doctorsList.map(d => (
+              <option key={d.id} value={d.id}>{d.name} ({d.specialty})</option>
+            ))}
+          </select>
         </div>
       </header>
 

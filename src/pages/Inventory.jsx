@@ -751,7 +751,13 @@ export default function Inventory() {
 
             <div className="modal-footer">
               <button onClick={() => setBarcodePrintItem(null)} className="btn btn-secondary">Close</button>
-              <button onClick={() => window.print()} className="btn btn-primary">Print / Save PDF</button>
+              <button onClick={() => {
+                if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
+                  window.AndroidPrintBridge.printPage();
+                } else {
+                  window.print();
+                }
+              }} className="btn btn-primary">Print / Save PDF</button>
             </div>
           </div>
         </div>

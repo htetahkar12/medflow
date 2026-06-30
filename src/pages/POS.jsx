@@ -309,7 +309,11 @@ export default function POS({ clinicMode }) {
   };
 
   const triggerPrintReceipt = () => {
-    window.print();
+    if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
+      window.AndroidPrintBridge.printPage();
+    } else {
+      window.print();
+    }
     setPrintInvoiceData(null);
   };
 
