@@ -375,7 +375,7 @@ label {
   color: var(--text-secondary);
 }
 
-input, select, textarea {
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 10px;
@@ -387,6 +387,15 @@ input, select, textarea {
   outline: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   min-height: 44px;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto !important;
+  min-height: auto !important;
+  cursor: pointer;
+  margin: 0;
+  accent-color: var(--primary);
 }
 
 input:focus, select:focus, textarea:focus {
@@ -855,6 +864,28 @@ input:focus, select:focus, textarea:focus {
   
   .full-width-card {
     grid-column: span 1 !important;
+  }
+
+  /* Make modals scrollable as a single block on mobile screen sizes (prevents clipped footers/buttons on iOS) */
+  .modal-overlay {
+    display: block !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 1.5rem 0.75rem !important;
+  }
+
+  .modal-content {
+    max-height: none !important;
+    overflow-y: visible !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .modal-body {
+    overflow-y: visible !important;
+    flex: none !important;
   }
 }
 
