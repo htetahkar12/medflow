@@ -885,7 +885,7 @@ export default function Consultation({ clinicMode, dutyDoctorId }) {
             <div>
               <h3 style={{ fontSize: '1rem', fontWeight: '700', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Order Investigations (Results Pending System)</h3>
               
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
+              <div className="responsive-split-grid-50" style={{ padding: '1rem', border: '1px solid var(--border-color)', borderRadius: '10px' }}>
                 <div>
                   <h4 style={{ fontSize: '0.85rem', marginBottom: '0.5rem', color: 'var(--primary)' }}>Laboratory Tests</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
