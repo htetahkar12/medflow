@@ -311,10 +311,13 @@ export default function POS({ clinicMode }) {
   const triggerPrintReceipt = () => {
     if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
       window.AndroidPrintBridge.printPage();
+      setTimeout(() => {
+        setPrintInvoiceData(null);
+      }, 4000);
     } else {
       window.print();
+      setPrintInvoiceData(null);
     }
-    setPrintInvoiceData(null);
   };
 
   return (
