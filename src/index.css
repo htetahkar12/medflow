@@ -703,6 +703,9 @@ input:focus, select:focus, textarea:focus {
   }
 
   body, #root, .app-layout, .main-content {
+    display: block !important;
+    height: auto !important;
+    min-height: auto !important;
     background: #ffffff !important;
     color: #000000 !important;
     padding: 0 !important;
