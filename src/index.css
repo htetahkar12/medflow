@@ -831,8 +831,36 @@ input:focus, select:focus, textarea:focus {
 
   /* Suppress default browser print headers and footers (URL, Date) */
   @page {
-    size: A4 portrait;
+    size: auto;
     margin: 0mm !important;
+  }
+
+  /* A5 Invoice print styling */
+  .a5-invoice {
+    width: 148mm;
+    min-height: 210mm;
+    padding: 10mm;
+    background: #fff !important;
+    color: #000000 !important;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Force pure black text color for all print areas (critical for dark mode printing) */
+  .print-area,
+  .print-area *,
+  .thermal-receipt,
+  .thermal-receipt *,
+  .a4-invoice,
+  .a4-invoice *,
+  .a5-invoice,
+  .a5-invoice *,
+  .printable-a4-document,
+  .printable-a4-document * {
+    color: #000000 !important;
+    -webkit-text-fill-color: #000000 !important;
+    background-color: transparent !important;
+    background: transparent !important;
   }
 }
 

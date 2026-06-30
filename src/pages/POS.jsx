@@ -310,13 +310,9 @@ export default function POS({ clinicMode }) {
 
   const triggerPrintReceipt = () => {
     if (window.AndroidPrintBridge && typeof window.AndroidPrintBridge.printPage === 'function') {
-      window.AndroidPrintBridge.printPage();
-      setTimeout(() => {
-        setPrintInvoiceData(null);
-      }, 4000);
+      window.AndroidPrintBridge.printPage(printPaperSize);
     } else {
       window.print();
-      setPrintInvoiceData(null);
     }
   };
 
@@ -558,6 +554,7 @@ export default function POS({ clinicMode }) {
                 <label>Select Invoice Print Layout</label>
                 <select value={printPaperSize} onChange={e => setPrintPaperSize(e.target.value)}>
                   <option value="thermal">Thermal Roll Receipt (80mm/58mm)</option>
+                  <option value="a5">A5 Invoice Sheet</option>
                   <option value="a4">Standard A4 Invoice Sheet</option>
                 </select>
               </div>
@@ -804,7 +801,7 @@ export default function POS({ clinicMode }) {
             </div>
           </div>
         ) : (
-          <div className="only-print print-area a4-invoice">
+          <div className={`only-print print-area ${printPaperSize === 'a5' ? 'a5-invoice' : 'a4-invoice'}`}>
             <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #333', paddingBottom: '10px', marginBottom: '20px' }}>
               <div>
                 <h1 style={{ fontSize: '22pt', fontWeight: 'bold', color: 'var(--primary)', margin: 0 }}>
