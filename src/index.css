@@ -930,6 +930,62 @@ input:focus, select:focus, textarea:focus {
     box-sizing: border-box !important;
   }
 
+  /* Convert flex/grid containers to tables in print layout for bulletproof mobile print engine support */
+  .a4-invoice > div[style*="display: flex"]:first-of-type,
+  .a5-invoice > div[style*="display: flex"]:first-of-type,
+  .a4-invoice > div[style*="display: grid"]:first-of-type,
+  .a5-invoice > div[style*="display: grid"]:first-of-type,
+  .a4-invoice > div[style*="display:flex"]:first-of-type,
+  .a5-invoice > div[style*="display:flex"]:first-of-type,
+  .a4-invoice > div[style*="display:grid"]:first-of-type,
+  .a5-invoice > div[style*="display:grid"]:first-of-type {
+    display: table !important;
+  }
+  .a4-invoice > div[style*="display"]:first-of-type > div,
+  .a5-invoice > div[style*="display"]:first-of-type > div {
+    display: table-cell !important;
+    width: 50% !important;
+    vertical-align: top !important;
+  }
+
+  .a4-invoice > div[style*="background"],
+  .a5-invoice > div[style*="background"] {
+    display: table !important;
+  }
+  .a4-invoice > div[style*="background"] > div,
+  .a5-invoice > div[style*="background"] > div {
+    display: table-cell !important;
+    width: 50% !important;
+    vertical-align: top !important;
+  }
+
+  /* Subtotal block right alignment using inline-block block rules */
+  .a4-invoice div[style*="justify-content: flex-end"],
+  .a5-invoice div[style*="justify-content: flex-end"] {
+    display: block !important;
+    text-align: right !important;
+    width: 100% !important;
+  }
+  .a4-invoice div[style*="justify-content: flex-end"] > div,
+  .a5-invoice div[style*="justify-content: flex-end"] > div {
+    display: inline-block !important;
+    text-align: left !important;
+  }
+
+  /* Signatures block split using table rules */
+  .a4-invoice div[style*="margin-top: 50px"],
+  .a5-invoice div[style*="margin-top: 50px"] {
+    display: table !important;
+    width: 100% !important;
+  }
+  .a4-invoice div[style*="margin-top: 50px"] > div,
+  .a5-invoice div[style*="margin-top: 50px"] > div {
+    display: table-cell !important;
+    width: 50% !important;
+    text-align: center !important;
+    vertical-align: top !important;
+  }
+
   .a4-invoice thead,
   .a5-invoice thead {
     display: table-header-group !important;
