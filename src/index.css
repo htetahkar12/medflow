@@ -708,8 +708,10 @@ input:focus, select:focus, textarea:focus {
     display: block !important;
   }
 
-  body, #root, .app-layout, .main-content {
+  html, body, #root, .app-layout, .main-content {
     display: block !important;
+    width: 100% !important;
+    max-width: none !important;
     height: auto !important;
     min-height: auto !important;
     background: #ffffff !important;
@@ -795,13 +797,13 @@ input:focus, select:focus, textarea:focus {
 
   /* A4 Invoice print styling */
   .a4-invoice {
-    width: 210mm;
-    min-height: 297mm;
-    padding: 15mm;
+    width: 210mm !important;
+    min-height: 297mm !important;
+    padding: 15mm !important;
     background: #fff !important;
     color: #000 !important;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    box-sizing: border-box !important;
+    font-family: 'Inter', sans-serif !important;
   }
 
   /* A4 Barcode Grid Sheet */

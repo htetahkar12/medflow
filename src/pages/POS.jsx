@@ -840,9 +840,9 @@ export default function POS({ clinicMode }) {
               <thead>
                 <tr style={{ background: '#0f172a', color: '#fff', textAlign: 'left' }}>
                   <th style={{ padding: '8px', border: '1px solid #334155', fontSize: '9.5pt' }}>Item Description</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'center', width: '70px', fontSize: '9.5pt' }}>Qty</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '120px', fontSize: '9.5pt' }}>Unit Price (Ks)</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '130px', fontSize: '9.5pt' }}>Total Cost (Ks)</th>
+                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'center', width: '10%', fontSize: '9.5pt' }}>Qty</th>
+                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '22%', fontSize: '9.5pt' }}>Unit Price (Ks)</th>
+                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '25%', fontSize: '9.5pt' }}>Total Cost (Ks)</th>
                 </tr>
               </thead>
               <tbody>
