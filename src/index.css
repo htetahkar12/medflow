@@ -854,6 +854,51 @@ input:focus, select:focus, textarea:focus {
     font-family: 'Inter', sans-serif !important;
   }
 
+  /* Scale down fonts and spacing for A5 printout to prevent text wrapping/clutter */
+  .a5-invoice h1 {
+    font-size: 14pt !important;
+  }
+  .a5-invoice h1 + div {
+    font-size: 8pt !important;
+  }
+  .a5-invoice h2 {
+    font-size: 13pt !important;
+  }
+  .a5-invoice h2 + div {
+    font-size: 8pt !important;
+  }
+  .a5-invoice div[style*="grid-template-columns"] > div > div:first-child {
+    font-size: 7.5pt !important;
+  }
+  .a5-invoice div[style*="grid-template-columns"] > div > div:nth-child(2) {
+    font-size: 9.5pt !important;
+    margin-top: 2px !important;
+  }
+  .a5-invoice div[style*="grid-template-columns"] > div > div:nth-child(3) {
+    font-size: 8pt !important;
+    margin-top: 1px !important;
+  }
+  .a5-invoice th,
+  .a5-invoice td {
+    font-size: 8pt !important;
+    padding: 6px 8px !important;
+  }
+  .a5-invoice table {
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+  }
+  .a5-invoice div[style*="justify-content: flex-end"] > div {
+    font-size: 8.5pt !important;
+    width: 200px !important;
+  }
+  .a5-invoice div[style*="grid-template-columns"]:last-of-type {
+    margin-top: 30px !important;
+    gap: 20px !important;
+  }
+  .a5-invoice div[style*="grid-template-columns"]:last-of-type strong {
+    font-size: 8pt !important;
+  }
+
   /* Force standard table display properties on print sheets (prevents mobile display: block overrides) */
   .a4-invoice table,
   .a5-invoice table {
