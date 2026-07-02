@@ -904,6 +904,7 @@ input:focus, select:focus, textarea:focus {
   .a5-invoice table {
     display: table !important;
     width: 100% !important;
+    table-layout: fixed !important; /* Force columns to respect percentage widths */
     border-collapse: collapse !important;
     margin-top: 15px !important;
     margin-bottom: 20px !important;
@@ -930,6 +931,8 @@ input:focus, select:focus, textarea:focus {
     padding: 8px 12px !important;
     font-size: 9.5pt !important;
     text-align: left !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
   }
   .a4-invoice th:nth-child(2),
   .a5-invoice th:nth-child(2) {
@@ -948,6 +951,8 @@ input:focus, select:focus, textarea:focus {
     border: 1px solid #e2e8f0 !important;
     padding: 8px 12px !important;
     font-size: 9.5pt !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
   }
 
   /* Force print styling and prevent dark backgrounds from printing solid black */
