@@ -900,15 +900,36 @@ input:focus, select:focus, textarea:focus {
   }
 
   /* Force standard table display properties on print sheets (prevents mobile display: block overrides) */
-  .a4-invoice table,
-  .a5-invoice table {
+  .a4-invoice table {
     display: table !important;
-    width: 100% !important;
+    width: 180mm !important;
+    max-width: 180mm !important;
     table-layout: fixed !important; /* Force columns to respect percentage widths */
     border-collapse: collapse !important;
     margin-top: 15px !important;
     margin-bottom: 20px !important;
   }
+  .a5-invoice table {
+    display: table !important;
+    width: 128mm !important;
+    max-width: 128mm !important;
+    table-layout: fixed !important; /* Force columns to respect percentage widths */
+    border-collapse: collapse !important;
+    margin-top: 15px !important;
+    margin-bottom: 20px !important;
+  }
+  /* Force direct child containers to span the exact paper content width */
+  .a4-invoice > div {
+    width: 180mm !important;
+    max-width: 180mm !important;
+    box-sizing: border-box !important;
+  }
+  .a5-invoice > div {
+    width: 128mm !important;
+    max-width: 128mm !important;
+    box-sizing: border-box !important;
+  }
+
   .a4-invoice thead,
   .a5-invoice thead {
     display: table-header-group !important;

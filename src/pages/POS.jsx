@@ -836,42 +836,44 @@ export default function POS({ clinicMode }) {
               </div>
             </div>
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
-              <thead>
-                <tr style={{ background: '#0f172a', color: '#fff', textAlign: 'left' }}>
-                  <th style={{ padding: '8px', border: '1px solid #334155', fontSize: '9.5pt' }}>Item Description</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'center', width: '10%', fontSize: '9.5pt' }}>Qty</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '22%', fontSize: '9.5pt' }}>Unit Price (Ks)</th>
-                  <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '25%', fontSize: '9.5pt' }}>Total Cost (Ks)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr style={{ fontSize: '9.5pt' }}>
-                  <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Consultation & Clinical Evaluation</td>
-                  <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>1</td>
-                  <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{printInvoiceData.consultationFee.toLocaleString()}</td>
-                  <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{printInvoiceData.consultationFee.toLocaleString()}</td>
-                </tr>
-                {printInvoiceData.investigationFee > 0 && (
+            <div style={{ width: '100%', boxSizing: 'border-box' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                <thead>
+                  <tr style={{ background: '#0f172a', color: '#fff', textAlign: 'left' }}>
+                    <th style={{ padding: '8px', border: '1px solid #334155', fontSize: '9.5pt' }}>Item Description</th>
+                    <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'center', width: '10%', fontSize: '9.5pt' }}>Qty</th>
+                    <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '22%', fontSize: '9.5pt' }}>Unit Price (Ks)</th>
+                    <th style={{ padding: '8px', border: '1px solid #334155', textAlign: 'right', width: '25%', fontSize: '9.5pt' }}>Total Cost (Ks)</th>
+                  </tr>
+                </thead>
+                <tbody>
                   <tr style={{ fontSize: '9.5pt' }}>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Diagnostics Lab & Medical Imaging Services</td>
+                    <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Consultation & Clinical Evaluation</td>
                     <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>1</td>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{printInvoiceData.investigationFee.toLocaleString()}</td>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{printInvoiceData.investigationFee.toLocaleString()}</td>
+                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{printInvoiceData.consultationFee.toLocaleString()}</td>
+                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{printInvoiceData.consultationFee.toLocaleString()}</td>
                   </tr>
-                )}
-                {printInvoiceData.items.map((item, idx) => (
-                  <tr key={idx} style={{ fontSize: '9.5pt' }}>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>
-                      {item.name} <span style={{ fontSize: '8pt', color: '#666' }}>({item.type === 'custom' ? 'Service/Fee' : 'Pharmacy'})</span>
-                    </td>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>{item.quantity}</td>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{item.unitPrice.toLocaleString()}</td>
-                    <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{item.totalCost.toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  {printInvoiceData.investigationFee > 0 && (
+                    <tr style={{ fontSize: '9.5pt' }}>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>Diagnostics Lab & Medical Imaging Services</td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>1</td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{printInvoiceData.investigationFee.toLocaleString()}</td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{printInvoiceData.investigationFee.toLocaleString()}</td>
+                    </tr>
+                  )}
+                  {printInvoiceData.items.map((item, idx) => (
+                    <tr key={idx} style={{ fontSize: '9.5pt' }}>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0' }}>
+                        {item.name} <span style={{ fontSize: '8pt', color: '#666' }}>({item.type === 'custom' ? 'Service/Fee' : 'Pharmacy'})</span>
+                      </td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'center' }}>{item.quantity}</td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right' }}>{item.unitPrice.toLocaleString()}</td>
+                      <td style={{ padding: '8px', border: '1px solid #e2e8f0', textAlign: 'right', fontWeight: 'bold' }}>{item.totalCost.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
               <div style={{ width: '280px', display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '9.5pt' }}>
