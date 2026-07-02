@@ -802,7 +802,7 @@ export default function POS({ clinicMode }) {
           </div>
         ) : (
           <div className={`only-print print-area ${printPaperSize === 'a5' ? 'a5-invoice' : 'a4-invoice'}`}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #333', paddingBottom: '10px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #333', paddingBottom: '10px', marginBottom: '20px', width: '100%', boxSizing: 'border-box' }}>
               <div>
                 <h1 style={{ fontSize: '22pt', fontWeight: 'bold', color: 'var(--primary)', margin: 0 }}>
                   {clinicConfig?.clinic_name || 'AURA CLINIC'}
@@ -821,7 +821,7 @@ export default function POS({ clinicMode }) {
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', marginBottom: '20px', width: '100%', boxSizing: 'border-box' }}>
               <div>
                 <div style={{ fontSize: '8.5pt', color: '#64748b' }}>BILL TO PATIENT:</div>
                 <div style={{ fontSize: '11pt', fontWeight: 'bold', marginTop: '3px' }}>{printInvoiceData.patientName}</div>

@@ -843,30 +843,83 @@ input:focus, select:focus, textarea:focus {
 
   /* A5 Invoice print styling */
   .a5-invoice {
-    width: 148mm;
-    min-height: 210mm;
-    padding: 10mm;
-    background: #fff !important;
-    color: #000000 !important;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
+    width: 148mm !important;
+    min-height: 210mm !important;
+    padding: 10mm !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+    box-sizing: border-box !important;
+    font-family: 'Inter', sans-serif !important;
   }
 
-  /* Force pure black text color for all print areas (critical for dark mode printing) */
+  /* Force standard table display properties on print sheets (prevents mobile display: block overrides) */
+  .a4-invoice table,
+  .a5-invoice table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 15px !important;
+    margin-bottom: 20px !important;
+  }
+  .a4-invoice thead,
+  .a5-invoice thead {
+    display: table-header-group !important;
+  }
+  .a4-invoice tbody,
+  .a5-invoice tbody {
+    display: table-row-group !important;
+  }
+  .a4-invoice tr,
+  .a5-invoice tr {
+    display: table-row !important;
+  }
+  .a4-invoice th,
+  .a5-invoice th {
+    display: table-cell !important;
+    background-color: #f1f5f9 !important; /* Elegant light grey header background */
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 8px 12px !important;
+    font-size: 9.5pt !important;
+    text-align: left !important;
+  }
+  .a4-invoice th:nth-child(2),
+  .a5-invoice th:nth-child(2) {
+    text-align: center !important;
+  }
+  .a4-invoice th:nth-child(3),
+  .a5-invoice th:nth-child(3),
+  .a4-invoice th:nth-child(4),
+  .a5-invoice th:nth-child(4) {
+    text-align: right !important;
+  }
+  .a4-invoice td,
+  .a5-invoice td {
+    display: table-cell !important;
+    color: #334155 !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 8px 12px !important;
+    font-size: 9.5pt !important;
+  }
+
+  /* Force print styling and prevent dark backgrounds from printing solid black */
   .print-area,
-  .print-area *,
   .thermal-receipt,
-  .thermal-receipt *,
   .a4-invoice,
-  .a4-invoice *,
   .a5-invoice,
-  .a5-invoice *,
-  .printable-a4-document,
-  .printable-a4-document * {
+  .printable-a4-document {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
     color: #000000 !important;
-    -webkit-text-fill-color: #000000 !important;
-    background-color: transparent !important;
-    background: transparent !important;
+  }
+
+  /* Make sure patient info boxes have a visible light background on print */
+  .a4-invoice div[style*="background"],
+  .a5-invoice div[style*="background"] {
+    background-color: #f8fafc !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
   }
 }
 
