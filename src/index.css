@@ -692,8 +692,14 @@ input:focus, select:focus, textarea:focus {
     --border-color: #333333 !important;
   }
 
-  /* Hide non-printable UI elements */
-  .no-print, nav, aside, .sidebar, .mobile-nav-toggle, header.no-print {
+  /* Hide non-printable UI elements with high specificity to defeat mobile media overrides */
+  body .no-print,
+  body nav,
+  body aside,
+  body .sidebar,
+  body .mobile-nav-toggle,
+  body header.no-print,
+  .modal-overlay.no-print {
     display: none !important;
   }
 
